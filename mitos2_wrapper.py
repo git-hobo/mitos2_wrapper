@@ -12,12 +12,13 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 
 class mitoannotation():
-    def __init__(self, fasta_file, refdir, gencode=2):
+    def __init__(self, fasta_file, refdir, refseqver, gencode=2):
         self.fasta = fasta_file
         self.gbk = "{}.gbk".format(os.path.splitext(self.fasta)[0])
         self.results = "{}_mitos".format(os.path.splitext(self.fasta)[0])
         self.gencode = gencode
         self.refdir = refdir
+        self.refseqver = refseqver
         self.bed_file = "{}/result.bed".format(self.results)
         self.feat_dict = {
         "cox1": {"name" : "COX1", "product" : "cytochrome c oxidase subunit I"},
@@ -201,7 +202,7 @@ if __name__ == "__main__":
         args.refseqver = args.refdir
     try:
         for fasta in args.fasta:
-            annotation = mitoannotation(fasta, args.refdir, gencode=args.gencode)
+            annotation = mitoannotation(fasta, args.refdir, args.refseqver, gencode=args.gencode)
             annotation.run_mitos()
             annotation.generate_gbk()
             if not args.keep:
