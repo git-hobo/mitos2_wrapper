@@ -91,7 +91,6 @@ class mitoannotation():
                    "--oril", "0",
                    "--orih", "0",
                  ]
-                 # --ncbicode is redundant when -c is given; safe to drop
                  mitos = subprocess.run(cmd, stdout=output, stderr=error)
                  if mitos.returncode != 0:
                      raise RuntimeError(f"MITOS failed (exit {mitos.returncode}). See log: {self.results}/mitos.log")                
