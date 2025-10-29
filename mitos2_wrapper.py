@@ -84,6 +84,7 @@ class mitoannotation():
                     "-c", str(self.gencode),
                     "-o", self.results,
                     "-R", self.refdir,
+                    "-r", self.refseqver,
                     "--linear",
                     "--noplots",
                     "--best",
