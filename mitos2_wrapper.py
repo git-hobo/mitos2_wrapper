@@ -75,38 +75,54 @@ class mitoannotation():
 
     def run_mitos(self):
         if not self.check_mitos_results():
-            print("Running MITOS for file {}...".format(self.fasta))
-            with open("mitos.out", "w+") as output, open('mitos.err', 'w+') as error:
+            print(f"Running MITOS for file {self.fasta}...")
+    
+            with open("mitos.out", "w+") as output, open("mitos.err", "w+") as error:
                 cmd = [
-                   "runmitos.py",
-                   "-i", self.fasta,
-                   "-c", str(self.gencode),          
-                   "-o", self.results,
-                   "-R", self.refdir,                
-                   "--linear",
-                   "--noplots",
-                   "--best",
-                   "--alarab",
-                   "--intron", "0",
-                   "--oril", "0",
-                   "--orih", "0",
-                 ]
-                 mitos = subprocess.run(cmd, stdout=output, stderr=error)
-                 if mitos.returncode != 0:
-                     raise RuntimeError(f"MITOS failed (exit {mitos.returncode}). See log: {self.results}/mitos.log")                
-                print("Finished MITOS with exit status {}".format(str(mitos.returncode)))
+                    "runmitos.py",
+                    "-i", self.fasta,
+                    "-c", str(self.gencode),
+                    "-o", self.results,
+                    "-R", self.refdir,
+                    "--linear",
+                    "--noplots",
+                    "--best",
+                    "--alarab",
+                    "--intron", "0",
+                    "--oril", "0",
+                    "--orih", "0",
+                ]
+    
+                mitos = subprocess.run(cmd, stdout=output, stderr=error)
+    
+                if mitos.returncode != 0:
+                    raise RuntimeError(
+                        f"MITOS failed (exit {mitos.returncode}). "
+                        f"See log: {self.results}/mitos.log"
+                    )
+    
+                print(f"Finished MITOS with exit status {mitos.returncode}")
+    
+                # Check the captured output for missing features
                 output.seek(0)
                 missing_feat = False
                 for line in output:
                     if line.startswith("missing:"):
                         missing_feat = True
-                        print('WARNING - {}'.format(line))
+                        print(f"WARNING - {line.strip()}")
                 if not missing_feat:
-                    print("All features were succesfully annotated")
+                    print("All features were successfully annotated")
+    
             os.remove("mitos.out")
             os.remove("mitos.err")
+    
         else:
-            print("Annotation process already finished. Skipping to generation of genbank file (if any)...")
+            print(
+                "Annotation process already finished. "
+                "Skipping to generation of GenBank file (if any)..."
+            )
+    
+                print("Annotation process already finished. Skipping to generation of genbank file (if any)...")
 
 
     def generate_gbk(self):
