@@ -77,7 +77,24 @@ class mitoannotation():
         if not self.check_mitos_results():
             print("Running MITOS for file {}...".format(self.fasta))
             with open("mitos.out", "w+") as output, open('mitos.err', 'w+') as error:
-                mitos = subprocess.run(["runmitos.py", "-i", self.fasta, "-c", str(self.gencode), "-o", self.results, "-r", self.refdir, "--linear", "--ncbicode", "--noplots", "--best", "--alarab", "--intron", "0", "--oril", "0", "--orih", "0"], stdout=output, stderr=error)                
+                cmd = [
+                   "runmitos.py",
+                   "-i", self.fasta,
+                   "-c", str(self.gencode),          
+                   "-o", self.results,
+                   "-R", self.refdir,                
+                   "--linear",
+                   "--noplots",
+                   "--best",
+                   "--alarab",
+                   "--intron", "0",
+                   "--oril", "0",
+                   "--orih", "0",
+                 ]
+                 # --ncbicode is redundant when -c is given; safe to drop
+                 mitos = subprocess.run(cmd, stdout=output, stderr=error)
+                 if mitos.returncode != 0:
+                     raise RuntimeError(f"MITOS failed (exit {mitos.returncode}). See log: {self.results}/mitos.log")                
                 print("Finished MITOS with exit status {}".format(str(mitos.returncode)))
                 output.seek(0)
                 missing_feat = False
@@ -158,13 +175,16 @@ def getArgs():
     default_refdir = "{}/refseq63m".format(os.path.dirname(os.path.realpath(__file__)))
     parser = argparse.ArgumentParser(description="A wrapper around MITOS (help on how to install and run here: https://gitlab.com/Bernt/MITOS) to annotate metazoan mitochondrial contigs using hmm (--alarab option)")
     parser.add_argument("-k", "--keep", action="store_true", default=False, help="Keeps MITOS annotation files. Default: False")
-    parser.add_argument("-c", "--gencode", type=int, metavar="GENETIC CODE", default=2, help="NCBI's codon table. Default: 2 (Vertebrate Mitochondrial)")
-    parser.add_argument("-r", "--refdir", type=str, metavar="REFERENCE DATA", default=default_refdir, help="Custom path to RefSeq63m directory (downloadable from https://zenodo.org/record/2672835). Default: {}".format(default_refdir))
+    parser.add_argument("-c", "--gencode", type=int, metavar="GENETIC CODE", default=5, help="NCBI's codon table. Default: 2 (Vertebrate Mitochondrial)")
+    parser.add_argument("-R", "--refdir", dest="refdir", default=None,help="Base directory containing reference data (e.g., RefSeq63m). Default: script path")
+    parser.add_argument("-r", "--refseqver", dest="refseqver", default=None, help=argparse.SUPPRESS)
     parser.add_argument("fasta", type=str, nargs="*", metavar="FASTA", help="Fasta file(s) to be annotated")
     return parser.parse_args()
 
 if __name__ == "__main__":
     args = getArgs()
+    if args.refseqver is None and args.refdir:
+        args.refseqver = args.refdir
     try:
         for fasta in args.fasta:
             annotation = mitoannotation(fasta, args.refdir, gencode=args.gencode)
