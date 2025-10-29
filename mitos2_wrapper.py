@@ -189,7 +189,7 @@ def getArgs():
     parser = argparse.ArgumentParser(description="A wrapper around MITOS (help on how to install and run here: https://gitlab.com/Bernt/MITOS) to annotate metazoan mitochondrial contigs using hmm (--alarab option)")
     parser.add_argument("-k", "--keep", action="store_true", default=False, help="Keeps MITOS annotation files. Default: False")
     parser.add_argument("-c", "--gencode", type=int, metavar="GENETIC CODE", default=5, help="NCBI's codon table. Default: 2 (Vertebrate Mitochondrial)")
-    parser.add_argument("-R", "--refdir", dest="refdir", efault=default_refdir, help="Base directory containing reference data (e.g., RefSeq63m). Default: script dir/refseq63m")
+    parser.add_argument("-R", "--refdir", dest="refdir", default=default_refdir, help="Base directory containing reference data (e.g., RefSeq63m). Default: script dir/refseq63m")
     parser.add_argument("-r", "--refseqver", dest="refseqver", default=None, help=argparse.SUPPRESS)
     parser.add_argument("fasta", type=str, nargs="*", metavar="FASTA", help="Fasta file(s) to be annotated")
     return parser.parse_args()
