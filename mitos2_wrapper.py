@@ -10,7 +10,6 @@ __contact__ = "gabrieldeusdeth@gmail.com"
 import subprocess, os, shutil, re
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.Alphabet import generic_dna
 
 class mitoannotation():
     def __init__(self, fasta_file, refdir, gencode=2):
@@ -138,7 +137,7 @@ class mitoannotation():
         if feat_name.strip().startswith("trn"): #'(' index used to separate codon/name - e.g. "trnL1(tag)" (MITOS output in .bed file) to "trnL1" and "tag". The codon is then reverse translated to obtain the anticodon sequence ('cua', in this case).
             separator_index = feat_name.find("(")
             codon = feat_name[separator_index+1:-1]
-            anticodon = str(Seq(codon, generic_dna).reverse_complement().transcribe())
+            anticodon = str(Seq(codon).reverse_complement().transcribe())
             feat_base_name = feat_name[:separator_index]
             final_feat_name = "{}-{}".format(feat_base_name, anticodon)
             product = self.feat_dict.get(feat_base_name).get("product")
